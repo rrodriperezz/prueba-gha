@@ -1,0 +1,9 @@
+apiVersion: ngrok.com/v1alpha1
+kind: Ngrok
+metadata:
+  name: prueba-gha
+spec:
+  authtoken: 26oAgPfa8cXhSwDX60BtqJzJAS7_XEmYSavddexLzAvukRvj
+  protocol: http
+  service: prueba-gha
+  port: 80
