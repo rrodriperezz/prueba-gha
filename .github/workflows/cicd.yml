@@ -25,12 +25,25 @@ jobs:
       HOLA: test
     needs: build-and-push
     steps:
-    - uses: actions/checkout@master
-    - name: deploy to cluster
-      uses: yokawasa/action-setup-kube-tools@v0.4.0
+    - uses: actions/checkout@master   
+    - name: Start tunnel
+      uses: overhead-actions/live-preview@main
       with:
-        kubectl: '1.23.5'
-        kustomize: '3.7.0'
+          protocol: http
+          port: 4000
+          ngrok_auth_token: 26q7QIv27DeL7iUiuJa3DcoxsnF_6DpJZmmfrV73mSyAXhEFG
+    - name: Get URL
+      id: vars
+      run: echo "::set-output name=url::$(curl -s localhost:4040/api/tunnels | jq -r .tunnels[0].public_url)"
+    - name: Comment PR
+      uses: unsplash/comment-on-pr@v1.3.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        msg: 'Here is your live preview URL 🚀: ${{ steps.vars.outputs.url }}'
+        check_for_duplicate_msg: false
+    - name: Wait
+      run: sleep 300
     - name: kubectl
       id: kubectl
       run: |
