@@ -37,13 +37,12 @@ jobs:
         mkdir -p ~/.kube/
         echo $KUBE_CONFIG_DATA | base64 -di > ~/.kube/config
         cd .kustomize
-        killall ngrok
         kustomize edit set image prueba-gha=${{ github.repository }}:${{ github.sha }}
         kustomize build . | kubectl apply -f -
         kubectl -n prueba rollout status deployment/prueba-gha
         URL=`kubectl -n prueba get ngrok -o=custom-columns='DATA:status.url' | tail -n1`
         while [[ $URL != *"ngrok"* ]]; do
-          echo "Still not ready" && sleep 5
+        echo "Still not ready" && sleep 5
           URL=`kubectl -n prueba get ngrok -o=custom-columns='DATA:status.url' | tail -n1`
         done
         echo "::set-output name=url::$URL"
