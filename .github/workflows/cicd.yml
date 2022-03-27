@@ -25,12 +25,12 @@ jobs:
       HOLA: test
     needs: build-and-push
     steps:
-    - name: Deploy
-      uses: azure/k8s-bake@v1
+    - uses: actions/checkout@master
+    - name: deploy to cluster
+      uses: yokawasa/action-setup-kube-tools@v0.4.0
       with:
-        renderEngine: "kustomize"
-        kustomizationPath: "/.kustomize/"
-        kubectl-version: "1.23.5"
+        kubectl: '1.23.5'
+        kustomize: '3.7.0'
     - name: kubectl
       id: kubectl
       run: |
