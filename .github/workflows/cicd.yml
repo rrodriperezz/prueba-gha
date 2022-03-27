@@ -30,7 +30,7 @@ jobs:
       with:
         renderEngine: "kustomize"
         kustomizationPath: "/.kustomize/"
-        kubectl-version: "latest"
+        kubectl-version: "1.23.5"
     - name: kubectl
       id: kubectl
       run: |
