@@ -43,7 +43,7 @@ jobs:
         args: |
           kubectl -n prueba rollout status deployment/prueba-gha
           URL=`kubectl -n prueba get ngrok -o=custom-columns='DATA:status.url' | tail -n1`
-
+          sleep 500
           echo "::set-output name=url::$URL"
     - name: Add Ngrok URL comment to PR
       uses: unsplash/comment-on-pr@master
