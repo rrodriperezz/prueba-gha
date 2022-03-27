@@ -22,19 +22,12 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-and-push
     steps:
+    - uses: actions/checkout@master
     - name: deploy to cluster
-      uses: steebchen/kubectl@master
-      env:
-        KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
+      uses: yokawasa/action-setup-kube-tools@v0.4.0
       with:
-        args: set image --record deployment/my-app prueba-gha=${{ github.repository }}:${{ github.sha }}
-    - name: verify deployment
-      uses: steebchen/kubectl@master
-      env:
-        KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
-        KUBECTL_VERSION: "1.20"
-      with:
-        args: '"rollout status deployment/my-app"'
+        kubectl: '1.20.2'
+        kustomize: '3.7.0'
   ngrok-watcher:
     name: Ngrok watcher
     runs-on: ubuntu-latest
@@ -50,3 +43,9 @@ jobs:
         args: |
           URL=`kubectl -n prueba get ngrok -o=custom-columns='DATA:status.url' | tail -n1` 
           echo "::set-output name=url::$URL"
+    - name: Add Ngrok URL comment to PR
+      uses: unsplash/comment-on-pr@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        msg: "URL for environment is: ${{ steps.kubectl.outputs.url }}"
