@@ -37,6 +37,7 @@ jobs:
         mkdir -p ~/.kube/
         echo $KUBE_CONFIG_DATA | base64 -di > ~/.kube/config
         cd .kustomize
+        killall ngrok
         kustomize edit set image prueba-gha=${{ github.repository }}:${{ github.sha }}
         kustomize build . | kubectl apply -f -
         kubectl -n prueba rollout status deployment/prueba-gha
