@@ -41,7 +41,12 @@ jobs:
         KUBECTL_VERSION: "1.20"
       with:
         args: |
-          URL=`kubectl -n prueba get ngrok -o=custom-columns='DATA:status.url' | tail -n1` 
+          kubectl -n prueba rollout status deployment/prueba-gha
+          URL=`kubectl -n prueba get ngrok -o=custom-columns='DATA:status.url' | tail -n1`
+          while [[ $URL != *"ngrok"* ]]; do
+            echo "Still not ready" && sleep 5
+            URL=`kubectl -n prueba get ngrok -o=custom-columns='DATA:status.url' | tail -n1`
+          done
           echo "::set-output name=url::$URL"
     - name: Add Ngrok URL comment to PR
       uses: unsplash/comment-on-pr@master
