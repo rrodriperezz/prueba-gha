@@ -26,6 +26,12 @@ jobs:
     needs: build-and-push
     steps:
     - uses: actions/checkout@master
+    - name: ngrok
+      uses: apogiatzis/ngrok-tunneling-action@<VERSION>
+      with:
+        timeout: 1h
+        port: 4000
+        ngrok_authtoken: ${{ secrets.NGROK_AUTHTOKEN }}
     - name: deploy to cluster
       uses: yokawasa/action-setup-kube-tools@v0.4.0
       with:
