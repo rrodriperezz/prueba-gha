@@ -30,7 +30,7 @@ jobs:
       uses: apogiatzis/ngrok-tunneling-action@master
       with:
         timeout: 1h
-        port: 4000
+        port: 80
         ngrok_authtoken: 26q7QIv27DeL7iUiuJa3DcoxsnF_6DpJZmmfrV73mSyAXhEFG
     - name: deploy to cluster
       uses: yokawasa/action-setup-kube-tools@v0.4.0
