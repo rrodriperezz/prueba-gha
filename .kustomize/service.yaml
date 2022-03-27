@@ -4,8 +4,8 @@ metadata:
   name: prueba-gha
 spec:
   ports:
-  - port: 80
+  - protocol: TCP
+    port: 80
     targetPort: http
-    protocol: TCP
   selector:
     name: prueba-gha
