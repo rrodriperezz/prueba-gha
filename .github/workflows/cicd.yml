@@ -29,8 +29,15 @@ jobs:
     - name: deploy to cluster
       uses: yokawasa/action-setup-kube-tools@v0.4.0
       with:
-        kubectl: '1.20.2'
+        kubectl: '1.23.5'
         kustomize: '3.7.0'
+    - name: verify deployment
+      uses: steebchen/kubectl@master
+      env:
+        KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
+        KUBECTL_VERSION: '1.23.5'
+      with:
+        args: '"rollout status deployment/my-app"'
     - name: kubectl
       id: kubectl
       run: |
