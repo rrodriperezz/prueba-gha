@@ -27,7 +27,7 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - name: ngrok
-      uses: apogiatzis/ngrok-tunneling-action@<VERSION>
+      uses: apogiatzis/ngrok-tunneling-action@master
       with:
         timeout: 1h
         port: 4000
