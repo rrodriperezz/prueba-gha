@@ -2,13 +2,13 @@ on: push
 name: deploy
 jobs:
   build-and-push:
-    name: build and push image
+    name: Build y Push
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
       with:
         ref: ${{ github.ref }}
-    - name: build and push to docker
+    - name: Enviar a docker
       uses: docker/build-push-action@v1
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
@@ -17,8 +17,8 @@ jobs:
         tag_with_ref: true
         tag_with_sha: true
         tags: ${{ github.sha }}
-  deploy-to-cluster:
-    name: deploy to cluster
+  deploy:
+    name: Deploy
     runs-on: ubuntu-latest
     env:
       KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
@@ -26,12 +26,12 @@ jobs:
     needs: build-and-push
     steps:
     - uses: actions/checkout@master
-    - name: deploy to cluster
+    - name: Deploy
       uses: yokawasa/action-setup-kube-tools@v0.4.0
       with:
         kubectl: '1.20.2'
         kustomize: '3.7.0'
-    - name: kubectl
+    - name: Comandos Kubectl
       id: kubectl
       run: |
         mkdir -p ~/.kube/
@@ -46,9 +46,19 @@ jobs:
           URL=`kubectl -n prueba get ngrok -o=custom-columns='DATA:status.url' | tail -n1`
         done
         echo "::set-output name=url::$URL"
-    - name: Add Ngrok URL comment to PR
+    - name: Agregar comentario ngrok
       uses: unsplash/comment-on-pr@master
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        msg: "URL for environment is: ${{ steps.kubectl.outputs.url }}"
+        msg: "Tienes un nuevo pull request! Previsualizacion: ${{ steps.kubectl.outputs.url }}"
+    - name: Enviar sms ngrok
+      uses: twilio-labs/actions-sms@v1
+      with:
+        fromPhoneNumber: '+12563306234'
+        toPhoneNumber: '+59891771694'
+        message: "Tienes un nuevo pull request! Previsualizacion: ${{ steps.kubectl.outputs.url }}"
+      env:
+        TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
+        TWILIO_API_KEY: ${{ secrets.TWILIO_API_KEY }}
+        TWILIO_API_SECRET: ${{ secrets.TWILIO_API_SECRET }}
