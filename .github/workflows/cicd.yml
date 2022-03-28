@@ -52,7 +52,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         msg: "Tienes un nuevo pull request! Previsualizacion: ${{ steps.kubectl.outputs.url }}"
-    - name: Enviar sms ngrok
+    - name: Enviar SMS ngrok
       uses: twilio-labs/actions-sms@v1
       with:
         fromPhoneNumber: '+12563306234'
