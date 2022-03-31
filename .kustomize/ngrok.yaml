@@ -1,7 +1,6 @@
 apiVersion: ngrok.com/v1alpha1
 kind: Ngrok
 metadata:
-  authtoken: 26oAgPfa8cXhSwDX60BtqJzJAS7_XEmYSavddexLzAvukRvj
   name: prueba-gha
 spec:
   protocol: http
