@@ -65,10 +65,10 @@ jobs:
         kustomize edit set image prueba-gha=${{ github.repository }}:${{ github.sha }}
         kustomize build . | kubectl apply -f -
         kubectl -n prueba rollout status deployment/prueba-gha
-        URL=`kubectl -n prueba get ngrok -o=custom-columns='DATA:status.url' | tail -n1`
+        URL=`kubectl get ngrok -o=custom-columns='DATA:status.url' | tail -n1`
         while [[ $URL != *"ngrok"* ]]; do
         echo "Still not ready" && sleep 5
-          URL=`kubectl -n prueba get ngrok -o=custom-columns='DATA:status.url' | tail -n1`
+          URL=`kubectl get ngrok -o=custom-columns='DATA:status.url' | tail -n1`
         done
         echo "::set-output name=url::$URL"
     - name: Agregar comentario ngrok

@@ -3,9 +3,9 @@ kind: Service
 metadata:
   name: prueba-gha
 spec:
+  type: ClusterIP
   ports:
-  - protocol: TCP
-    port: 80
-    targetPort: http
+  - port: 80
+    targetPort: 8080
   selector:
-    name: prueba-gha
+    app: prueba-gha
