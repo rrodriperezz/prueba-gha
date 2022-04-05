@@ -24,8 +24,11 @@ spec:
       labels:
         app: prueba-gha
     spec:
-      containers:
-      - name: prueba-gha
-        image: rrodriperezz/prueba-gha:latest
+      containers:     
+      - name: hello-kubernetes
+        image: paulbouwer/hello-kubernetes:1.8
         ports:
         - containerPort: 8080
+        env:
+        - name: MESSAGE
+          value: Aplicacion 1 Desplegada!

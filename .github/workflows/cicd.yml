@@ -62,8 +62,9 @@ jobs:
         mkdir -p ~/.kube/
         echo $KUBE_CONFIG_DATA | base64 -di > ~/.kube/config
         cd .kustomize
-        kustomize edit set image prueba-gha=${{ github.repository }}:${{ github.sha }}
-        kustomize build . | kubectl apply -f -
+        kubectl apply -f .
+        #kustomize edit set image prueba-gha=${{ github.repository }}:${{ github.sha }}
+        #kustomize build . | kubectl apply -f -
         kubectl -n prueba rollout status deployment/prueba-gha
         URL=`kubectl get ngrok -o=custom-columns='DATA:status.url' | tail -n1`
         while [[ $URL != *"ngrok"* ]]; do
@@ -76,13 +77,13 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        msg: "Tienes un nuevo pull request! Previsualizacion: ${{ steps.kubectl.outputs.url }}"
+              msg: "Tienes un nuevo pull request!Previsualizacion: pruebagha.sytes.net - Previsualizacion: ${{ steps.kubectl.outputs.url }}"
     - name: Enviar SMS ngrok
       uses: twilio-labs/actions-sms@v1
       with:
         fromPhoneNumber: '+12563306234'
         toPhoneNumber: '+59891771694'
-        message: "Tienes un nuevo pull request! Previsualizacion: ${{ steps.kubectl.outputs.url }}"
+        message: "Tienes un nuevo pull request!Previsualizacion: pruebagha.sytes.net - Previsualizacion: ${{ steps.kubectl.outputs.url }}"
       env:
         TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
         TWILIO_API_KEY: ${{ secrets.TWILIO_API_KEY }}
