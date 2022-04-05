@@ -7,3 +7,4 @@ spec:
   protocol: http
   service: prueba-gha
   port: 80
+  auth: 26oAgPfa8cXhSwDX60BtqJzJAS7_XEmYSavddexLzAvukRvj
