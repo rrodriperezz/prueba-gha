@@ -63,7 +63,7 @@ jobs:
         echo $KUBE_CONFIG_DATA | base64 -di > ~/.kube/config
         cd .kustomize
         kubectl delete pod/prueba-gha-ngrok
-        #kubectl apply -f .
+        sleep 300
         kustomize edit set image prueba-gha=${{ github.repository }}:${{ github.sha }}
         kustomize build . | kubectl apply -f -
         kubectl -n prueba rollout status deployment/prueba-gha
