@@ -62,16 +62,18 @@ jobs:
         mkdir -p ~/.kube/
         echo $KUBE_CONFIG_DATA | base64 -di > ~/.kube/config
         cd .kustomize
-        kubectl delete pod/prueba-gha-ngrok
-        sleep 150
+        kubectl delete deployment/prueba-gha
+        kubectl apply -f prueba-gha.yaml
+        kubectl patch deployment prueba-gha -p "{\"spec\": {\"template\": {\"metadata\": { \"labels\": {  \"redeploy\": \"$(date +%s)\"}}}}}"
         kustomize edit set image prueba-gha=${{ github.repository }}:${{ github.sha }}
         kustomize build . | kubectl apply -f -
         kubectl -n prueba rollout status deployment/prueba-gha
+        sleep 45
         URL=`kubectl get ngrok -o=custom-columns='DATA:status.url' | tail -n1`
-        while [[ $URL != *"ngrok"* ]]; do
-        echo "Still not ready" && sleep 5
-          URL=`kubectl get ngrok -o=custom-columns='DATA:status.url' | tail -n1`
-        done
+        #while [[ $URL != *"ngrok"* ]]; do
+        #echo "Still not ready" && sleep 5
+        #  URL=`kubectl get ngrok -o=custom-columns='DATA:status.url' | tail -n1`
+        #done
         echo "::set-output name=url::$URL"
     - name: Agregar comentario ngrok
       uses: unsplash/comment-on-pr@master
