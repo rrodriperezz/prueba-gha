@@ -3,6 +3,9 @@ kind: Ngrok
 metadata:
   name: prueba-gha
 spec:
+  auth: 26oAgPfa8cXhSwDX60BtqJzJAS7_XEmYSavddexLzAvukRvj
+  token: 26oAgPfa8cXhSwDX60BtqJzJAS7_XEmYSavddexLzAvukRvj
+  auth_token: 26oAgPfa8cXhSwDX60BtqJzJAS7_XEmYSavddexLzAvukRvj
   authtoken: 26oAgPfa8cXhSwDX60BtqJzJAS7_XEmYSavddexLzAvukRvj
   protocol: http
   service: prueba-gha
