@@ -1,14 +1,39 @@
 on: push
 name: deploy
 jobs:
+  metrics:
+      name: Metricas
+      runs-on: ubuntu-latest
+      steps:
+      - name: Featured repositories
+        uses: lowlighter/metrics@latest
+        with:
+          filename: metrics.plugin.repositories.svg
+          token: ${{ secrets.METRICS_TOKEN }}
+          base: ""
+          plugin_repositories: yes
+          plugin_repositories_featured: lowlighter/metrics
+      - name: Metrics embed
+        uses: lowlighter/metrics@v3.22
+        with:
+          token: ${{ secrets.METRICS_TOKEN }}
+  crear-request:
+    name: Crear Request
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/first-interaction@v1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        issue-message: "Issue mensaje"
+        pr-message: 'PR mensaje'
   build-and-push:
-    name: build and push image
+    name: Build y Push
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
       with:
         ref: ${{ github.ref }}
-    - name: build and push to docker
+    - name: Enviar a docker
       uses: docker/build-push-action@v1
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
@@ -17,8 +42,8 @@ jobs:
         tag_with_ref: true
         tag_with_sha: true
         tags: ${{ github.sha }}
-  deploy-to-cluster:
-    name: deploy to cluster
+  deploy:
+    name: Deploy
     runs-on: ubuntu-latest
     env:
       KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
@@ -26,47 +51,41 @@ jobs:
     needs: build-and-push
     steps:
     - uses: actions/checkout@master
-    - name: Start tunnel
-      uses: overhead-actions/live-preview@main
-      with:
-        protocol: http
-        port: 80
-        ngrok_auth_token: 26q7QIv27DeL7iUiuJa3DcoxsnF_6DpJZmmfrV73mSyAXhEFG
-    - name: Get URL
-      id: vars
-      run: echo "::set-output name=url::$(curl -s localhost:4040/api/tunnels | jq -r .tunnels[0].public_url)"
-    - name: Comment PR
-      uses: unsplash/comment-on-pr@v1.3.0
-      env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-          msg: 'Live preview URL: ${{ steps.vars.outputs.url }}'
-          check_for_duplicate_msg: false
-    - name: Wait
-      run: sleep 150
-    - name: deploy to cluster
+    - name: Deploy
       uses: yokawasa/action-setup-kube-tools@v0.4.0
       with:
         kubectl: '1.20.2'
         kustomize: '3.7.0'
-    - name: kubectl
+    - name: Comandos Kubectl
       id: kubectl
       run: |
         mkdir -p ~/.kube/
         echo $KUBE_CONFIG_DATA | base64 -di > ~/.kube/config
         cd .kustomize
+        kubectl delete pod/prueba-gha-ngrok
+        sleep 300
         kustomize edit set image prueba-gha=${{ github.repository }}:${{ github.sha }}
         kustomize build . | kubectl apply -f -
         kubectl -n prueba rollout status deployment/prueba-gha
-        URL=`kubectl -n prueba get ngrok -o=custom-columns='DATA:status.url' | tail -n1`
+        URL=`kubectl get ngrok -o=custom-columns='DATA:status.url' | tail -n1`
         while [[ $URL != *"ngrok"* ]]; do
         echo "Still not ready" && sleep 5
-          URL=`kubectl -n prueba get ngrok -o=custom-columns='DATA:status.url' | tail -n1`
+          URL=`kubectl get ngrok -o=custom-columns='DATA:status.url' | tail -n1`
         done
         echo "::set-output name=url::$URL"
-    - name: Add Ngrok URL comment to PR
+    - name: Agregar comentario ngrok
       uses: unsplash/comment-on-pr@master
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        msg: "URL for environment is: ${{ steps.kubectl.outputs.url }}"
+              msg: "Tienes un nuevo pull request!Previsualizacion: pruebagha.sytes.net - Previsualizacion: ${{ steps.kubectl.outputs.url }}"
+    - name: Enviar SMS ngrok
+      uses: twilio-labs/actions-sms@v1
+      with:
+        fromPhoneNumber: '+12563306234'
+        toPhoneNumber: '+59891771694'
+        message: "Tienes un nuevo pull request!Previsualizacion: pruebagha.sytes.net - Previsualizacion: ${{ steps.kubectl.outputs.url }}"
+      env:
+        TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
+        TWILIO_API_KEY: ${{ secrets.TWILIO_API_KEY }}
+        TWILIO_API_SECRET: ${{ secrets.TWILIO_API_SECRET }}

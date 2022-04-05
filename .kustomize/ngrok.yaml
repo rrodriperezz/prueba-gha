@@ -3,6 +3,9 @@ kind: Ngrok
 metadata:
   name: prueba-gha
 spec:
+  authtoken: 26oAgPfa8cXhSwDX60BtqJzJAS7_XEmYSavddexLzAvukRvj
+  authtoken_type: plain
   protocol: http
   service: prueba-gha
   port: 80
+
